@@ -1,133 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import NoSSR from "./NoSSR";
-import sortBy from "lodash.sortby";
-import { Button } from "@/components/ui/button";
 import { FFmpegProvider, useFFmpeg } from "@/context/FFmpeg";
-import { PlayerProvider, usePlayer } from "@/context/Player";
-import { AppStateProvider, useAppState, Slice } from "@/context/AppState";
-import { Slider } from "@/components/ui/double-thumb-slider";
+import { PlayerProvider } from "@/context/Player";
+import { AppStateProvider, useAppState } from "@/context/AppState";
+import { Separator } from "@/components/ui/separator";
 import { PlayerControls } from "@/components/PlayerControls";
 import { Waveform } from "@/components/WaveForm";
-import { Time } from "@/components/Time";
-
-const SourcePlayer = () => {
-  return (
-    <div>
-      <div>
-        <PlayerControls />
-        <hr />
-      </div>
-      <div>
-        <Waveform />
-      </div>
-    </div>
-  );
-};
-
-// const SlicePlayer = ({ slice }: { slice: Slice }) => {
-//   const {
-//     duration,
-//     play,
-//     togglePlayback,
-//     playbackState,
-//     setCurrentTime,
-//     currentTime,
-//   } = usePlayer();
-//   const { activateSlice, sliceAudioToFile } = useAppState();
-//   const [showControls, setShowControls] = useState<boolean>(true);
-//   const [range, setRange] = useState<[number, number]>([
-//     slice.start,
-//     slice.end,
-//   ]);
-
-//   useEffect(() => {
-//     if (slice.isActive && currentTime >= range[1]) {
-//       setCurrentTime(range[0]);
-//     }
-//   }, [currentTime, range, slice.isActive]);
-
-//   return (
-//     <div className={!slice.isActive ? "opacity-75" : ""}>
-//       <strong>{slice.id}</strong>
-//       <Waveform />
-//       <>
-//         <div style={{ marginTop: "-100px" }}>
-//           <Slider
-//             onValueChange={(v) => {
-//               if (slice.isActive) {
-//                 if (v[0] !== range[0]) {
-//                   // left side of the range moved
-//                   setCurrentTime(v[0]);
-//                 } else {
-//                   // right side of the range moved
-//                   setCurrentTime(v[0] + 0.95 * (v[1] - v[0]));
-//                 }
-//                 play();
-//               }
-
-//               setRange(v);
-//             }}
-//             className="w-100%"
-//             defaultValue={range}
-//             max={duration}
-//             step={1}
-//             onPointerDown={() => {
-//               activateSlice(slice);
-//               if (playbackState === "playing") {
-//                 setShowControls(false);
-//                 togglePlayback();
-//               }
-//             }}
-//             onPointerUp={() => {
-//               setShowControls(true);
-//             }}
-//           />
-//           {/* offset based on the slider overall position */}
-//           <div
-//             style={{
-//               paddingLeft: `${Math.floor((range[0] / duration) * 100)}%`,
-//             }}
-//           >
-//             <div style={{ padding: "10px" }}>
-//               {showControls ? (
-//                 <>
-//                   <Button
-//                     onClick={() => {
-//                       activateSlice(slice);
-//                       setCurrentTime(range[0]);
-//                       togglePlayback();
-//                     }}
-//                   >
-//                     {slice.isActive
-//                       ? `${playbackState === "paused" ? "Play" : "Pause"}`
-//                       : "Play"}
-//                   </Button>
-//                   <Button
-//                     onClick={async () => {
-//                       await sliceAudioToFile({
-//                         start: range[0],
-//                         end: range[1],
-//                       });
-//                     }}
-//                   >
-//                     Download
-//                   </Button>
-//                   <Time time={range[0]} /> {"-"} <Time time={range[1]} />
-//                 </>
-//               ) : null}
-//             </div>
-//           </div>
-//         </div>
-//       </>
-//     </div>
-//   );
-// };
+import { Slices } from "@/components/Slices";
+import { FileAudio, Slice } from "lucide-react";
 
 function Home() {
-  const { removeSlice, slices, source, setSource, sliceAudioToFile } =
-    useAppState();
+  const { slices, source, setSource } = useAppState();
   const { loading: loadingFFmpeg, loadSource } = useFFmpeg();
 
   useEffect(() => {
@@ -173,36 +58,26 @@ function Home() {
         </div>
       ) : (
         <PlayerProvider sourceURL={source.url}>
-          <SourcePlayer />
-          <hr style={{ marginTop: "10px", marginBottom: "10px" }} />
+          <h2 className="scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight first:mt-0">
+            <div className="flex items-center">
+              <div className="w-8 flex-none">
+                <FileAudio />
+              </div>
+              <div className="flex-grow">{source.filename}</div>
+            </div>
+          </h2>
 
-          <ul>
-            {sortBy(slices, "start").map((slice) => (
-              <li
-                style={{
-                  fontWeight: slice.isActive ? "bold" : "normal",
-                  backgroundColor: slice.color,
-                }}
-                key={slice.id}
-              >
-                <Time time={slice.start} /> {"-"} <Time time={slice.end} />
-                <button
-                  onClick={() => {
-                    sliceAudioToFile(slice);
-                  }}
-                >
-                  Download
-                </button>
-                <button
-                  onClick={() => {
-                    removeSlice(slice);
-                  }}
-                >
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="flex py-4 items-center">
+            <div className="flex-none w-32">
+              <PlayerControls />
+            </div>
+
+            <div className="grow">
+              <Waveform />
+            </div>
+          </div>
+
+          <Slices />
         </PlayerProvider>
       )}
     </>
@@ -212,11 +87,33 @@ function Home() {
 export default function HomePage() {
   return (
     <NoSSR>
-      <FFmpegProvider>
-        <AppStateProvider>
-          <Home />
-        </AppStateProvider>
-      </FFmpegProvider>
+      <div className="h-full flex flex-col">
+        <div className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
+          <h2 className="text-lg font-semibold">
+            <div className="flex">
+              <div className="w-8 flex-none">
+                <Slice />
+              </div>
+              <div className="flex-grow">Katana</div>
+            </div>
+          </h2>
+          <div className="ml-auto flex w-full space-x-2 sm:justify-end"></div>
+        </div>
+
+        <Separator />
+
+        <div className="container h-full py-6">
+          <div className="grid h-full items-stretch">
+            <div>
+              <FFmpegProvider>
+                <AppStateProvider>
+                  <Home />
+                </AppStateProvider>
+              </FFmpegProvider>
+            </div>
+          </div>
+        </div>
+      </div>
     </NoSSR>
   );
 }

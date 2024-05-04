@@ -14,10 +14,6 @@ const random = (min: number, max: number) => Math.random() * (max - min) + min;
 const randomColor = () =>
   `rgba(${random(0, 255)}, ${random(0, 255)}, ${random(0, 255)}, 0.5)`;
 
-const rgbToRGBA = (rgb: string, alpha: number) => {
-  `rgba(${rgb.replace(/[r|g|b|(|)]/gi, "")}, ${alpha})`;
-};
-
 export const Waveform = () => {
   const { slices, addSlice, updateSlice, deactiveSlice } = useAppState();
   const { audio } = usePlayer();
@@ -25,14 +21,10 @@ export const Waveform = () => {
   const regions = useMemo(() => RegionsPlugin.create(), []);
   const { wavesurfer, isReady } = useWavesurfer({
     container: containerRef,
-    //height: 100,
+    height: 50,
     waveColor: "rgb(200, 0, 200)",
     progressColor: "rgb(100, 0, 100)",
     media: audio,
-    // Set a bar width
-    // barWidth: 4,
-    // barGap: 4,
-    // barRadius: 2,
     plugins: useMemo(
       () => [
         regions,

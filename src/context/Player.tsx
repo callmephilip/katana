@@ -1,6 +1,5 @@
 "use client";
 
-import debounce from "lodash.debounce";
 import React, {
   createContext,
   useContext,
@@ -23,8 +22,6 @@ interface PlayerContextValue {
 const PlayerContext = createContext<PlayerContextValue | undefined>(undefined);
 
 type PlaybackState = "playing" | "paused";
-
-const debounceTime = 500;
 
 export const PlayerProvider = ({
   sourceURL,
@@ -66,11 +63,11 @@ export const PlayerProvider = ({
           audioRef.current!.currentTime = time;
           setCurrentTime(time);
         },
-        play: debounce(() => {
+        play: () => {
           audioRef.current!.play();
           setPlaybackState("playing");
-        }, debounceTime),
-        togglePlayback: debounce(() => {
+        },
+        togglePlayback: () => {
           if (playbackState === "playing") {
             audioRef.current!.pause();
             setPlaybackState("paused");
@@ -78,7 +75,7 @@ export const PlayerProvider = ({
             audioRef.current!.play();
             setPlaybackState("playing");
           }
-        }, debounceTime),
+        },
       }}
     >
       <audio

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useFFmpeg } from "@/context/FFmpeg";
 
 interface Source {
@@ -13,6 +13,7 @@ export interface Slice {
   isActive: boolean;
   start: number;
   end: number;
+  color?: string;
 }
 
 interface AppStateContextValue {
@@ -20,19 +21,17 @@ interface AppStateContextValue {
   setSource: (source: Source) => void;
   slices: Slice[];
   addSlice: (slice: Slice) => void;
-  activateSlice: (slice: Slice) => void;
-  sliceAudioToFile: ({
-    start,
-    end,
-  }: {
-    start: number;
-    end: number;
-  }) => Promise<void>;
+  removeSlice: (slice: Slice) => void;
+  updateSlice: (slice: Slice) => void;
+  deactiveSlice: () => void;
+  sliceAudioToFile: (slice: Slice) => Promise<void>;
 }
 
 const AppStateContext = createContext<AppStateContextValue | undefined>(
   undefined
 );
+
+const localStorageKey = "katana-app-state";
 
 export const AppStateProvider = ({
   children,
@@ -41,7 +40,21 @@ export const AppStateProvider = ({
 }) => {
   const { sliceAudioToFile } = useFFmpeg();
   const [source, setSource] = useState<Source | null>(null);
-  const [slices, setSlices] = useState<Slice[]>([]);
+  const [slices, setSlices] = useState<Slice[]>(
+    JSON.parse(
+      localStorage.getItem(localStorageKey) || JSON.stringify({ slices: [] })
+    ).slices
+  );
+
+  useEffect(() => {
+    localStorage.setItem(
+      localStorageKey,
+      JSON.stringify({
+        slices,
+      })
+    );
+  }, [slices]);
+
   return (
     <AppStateContext.Provider
       value={{
@@ -51,30 +64,51 @@ export const AppStateProvider = ({
           setSource(source);
         },
         addSlice(slice) {
-          setSlices([
-            ...slices.map((s) => ({ ...s, isActive: false })),
-            {
-              id: new Date().getTime().toString(),
-              start: 0,
-              end: 10,
-              isActive: true,
-            },
+          setSlices((slices) => {
+            if (slices.find((s) => s.id === slice.id)) {
+              // trying to add existing slice
+              return slices.map((s) => {
+                return s.id === slice.id
+                  ? { ...slice, isActive: true }
+                  : { ...s, isActive: false };
+              });
+            } else {
+              return [
+                ...slices.map((s) => ({ ...s, isActive: false })),
+                { ...slice, isActive: true },
+              ];
+            }
+          });
+        },
+        updateSlice(slice) {
+          const isActive = slice.isActive;
+
+          setSlices((slices) => [
+            ...slices.map((s) => {
+              return s.id !== slice.id
+                ? isActive
+                  ? { ...s, isActive: false } // there can only be one
+                  : s
+                : slice;
+            }),
           ]);
         },
-        activateSlice(slice) {
-          setSlices([
-            ...slices.map((s) => ({
-              ...s,
-              isActive: s.id === slice.id,
-            })),
-          ]);
+        removeSlice(slice) {
+          setSlices((slices) => slices.filter((s) => s.id !== slice.id));
         },
-        async sliceAudioToFile({ start, end }) {
+        deactiveSlice() {
+          setSlices((slices) =>
+            slices.map((s) => {
+              return { ...s, isActive: false };
+            })
+          );
+        },
+        async sliceAudioToFile(slice) {
           if (source!.filename) {
             await sliceAudioToFile({
               input: source!.filename,
-              start,
-              end,
+              start: slice.start,
+              end: slice.end,
             });
           }
         },

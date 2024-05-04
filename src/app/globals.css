@@ -79,3 +79,9 @@
 .slider-root > span {
   z-index: 50;
 }
+
+/* customize sound wave */
+
+#waveform ::part(timeline) {
+  padding-top: 10px;
+}

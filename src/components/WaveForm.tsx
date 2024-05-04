@@ -1,30 +1,153 @@
 "use client";
 
-import { useRef, useState } from "react";
+import difference from "lodash.difference";
+import { useRef, useMemo, useEffect } from "react";
+import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
+import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js";
 import { useWavesurfer } from "@wavesurfer/react";
 import { usePlayer } from "@/context/Player";
+import { useAppState } from "@/context/AppState";
+
+// Give regions a random color when they are created
+const random = (min: number, max: number) => Math.random() * (max - min) + min;
+
+const randomColor = () =>
+  `rgba(${random(0, 255)}, ${random(0, 255)}, ${random(0, 255)}, 0.5)`;
+
+const rgbToRGBA = (rgb: string, alpha: number) => {
+  `rgba(${rgb.replace(/[r|g|b|(|)]/gi, "")}, ${alpha})`;
+};
 
 export const Waveform = () => {
+  const { slices, addSlice, updateSlice, deactiveSlice } = useAppState();
   const { audio } = usePlayer();
   const containerRef = useRef(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const { wavesurfer, isPlaying, currentTime } = useWavesurfer({
+  const regions = useMemo(() => RegionsPlugin.create(), []);
+  const { wavesurfer, isReady } = useWavesurfer({
     container: containerRef,
-    height: 100,
+    //height: 100,
     waveColor: "rgb(200, 0, 200)",
     progressColor: "rgb(100, 0, 100)",
     media: audio,
-    // url,
-    // plugins: useMemo(() => [Timeline.create()], []),
-  });
-  wavesurfer?.on("redrawcomplete", () => {
-    setLoading(false);
+    // Set a bar width
+    // barWidth: 4,
+    // barGap: 4,
+    // barRadius: 2,
+    plugins: useMemo(
+      () => [
+        regions,
+        TimelinePlugin.create({
+          height: 10,
+          timeInterval: 30,
+          primaryLabelInterval: 60,
+          style: {
+            fontSize: "8px",
+            color: "#6A3274",
+          },
+        }),
+      ],
+      []
+    ),
   });
 
-  return (
-    <>
-      {loading ? <strong>Loading...</strong> : null}
-      <div ref={containerRef} />
-    </>
-  );
+  useEffect(() => {
+    if (!isReady) return;
+
+    regions.on("region-created", (region) => {
+      if (slices.map((s) => s.id).includes(region.id)) {
+        return;
+      }
+      console.log("Created region", region);
+      const color = randomColor();
+      region.setOptions({ color });
+      addSlice({
+        id: region.id,
+        isActive: false,
+        start: region.start,
+        end: region.end,
+        color,
+      });
+    });
+
+    regions.on("region-updated", (region) => {
+      console.log("Updated region", region);
+      updateSlice({
+        id: region.id,
+        isActive: true,
+        start: region.start,
+        end: region.end,
+        color: region.color,
+      });
+    });
+
+    regions.on("region-clicked", (region, e) => {
+      e.stopPropagation();
+      // region.setOptions({ content: "Playing" });
+      updateSlice({
+        id: region.id,
+        isActive: true,
+        start: region.start,
+        end: region.end,
+        color: region.color,
+      });
+    });
+
+    regions.enableDragSelection({
+      color: "rgba(255, 0, 0, 0.1)",
+      drag: true,
+      resize: true,
+    });
+
+    slices.forEach((slice) => {
+      console.log(
+        ">>>>>>>>>>>>>>> Adding slice from application state ",
+        slice
+      );
+      regions.addRegion({
+        id: slice.id,
+        start: slice.start,
+        end: slice.end,
+        color: slice.color,
+        content: slice.isActive ? "▶️" : undefined,
+      });
+    });
+
+    wavesurfer?.on("click", () => {
+      deactiveSlice();
+    });
+  }, [isReady]);
+
+  useEffect(() => {
+    console.log(">>>>>>>>> check for slice removal >>>>>>>>>>>>>>>>", slices);
+    console.log(">>>>>>>>> for regions >>>>>>>>>>>>>>>>", regions.getRegions());
+    const regionsToDelete = difference(
+      regions.getRegions().map((r) => r.id),
+      slices.map((s) => s.id)
+    );
+    regionsToDelete.forEach((id: string) => {
+      const r = regions.getRegions().find((r) => r.id === id);
+      if (r) {
+        r.remove();
+      }
+    });
+
+    // region to activate
+    const activeRegionId = slices.find((s) => s.isActive)?.id;
+
+    if (activeRegionId) {
+      regions
+        .getRegions()
+        .forEach((r) =>
+          r.setContent(r.id === activeRegionId ? "▶️" : undefined)
+        );
+    } else {
+      regions.getRegions().forEach((r) => r.setContent(undefined));
+    }
+  }, [slices]);
+
+  wavesurfer?.on("redrawcomplete", () => {
+    // setLoading(false);
+  });
+
+  return <div id="waveform" ref={containerRef} />;
 };

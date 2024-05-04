@@ -1,7 +1,14 @@
 "use client";
 
 import debounce from "lodash.debounce";
-import React, { createContext, useContext, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
+import { useAppState } from "@/context/AppState";
 
 interface PlayerContextValue {
   audio: HTMLAudioElement;
@@ -30,8 +37,22 @@ export const PlayerProvider = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [duration, setDuration] = useState<number>(0);
   const [playbackState, setPlaybackState] = useState<PlaybackState>("paused");
-
   const [currentTime, setCurrentTime] = useState<number>(0);
+  const { slices } = useAppState();
+
+  useEffect(() => {
+    console.log(">>>>>>>>>>>>>>>>> tracking playback for slices", slices);
+    const activeSlice = slices.find((s) => s.isActive);
+
+    if (activeSlice) {
+      audioRef.current!.currentTime = activeSlice.start;
+      audioRef.current!.play();
+      setPlaybackState("playing");
+    } else {
+      audioRef.current!.pause();
+      setPlaybackState("paused");
+    }
+  }, [slices]);
 
   return (
     <PlayerContext.Provider
@@ -62,15 +83,14 @@ export const PlayerProvider = ({
     >
       <audio
         onTimeUpdate={() => {
-          setCurrentTime(audioRef.current!.currentTime);
-          // console.log("timeupdate", range.current.length);
-          // if (range.current.length === 2) {
-          //   if (audioRef.current!.currentTime >= range.current[1]) {
-          //     audioRef.current!.pause();
-          //     audioRef.current!.currentTime = range.current[0];
-          //     audioRef.current!.play();
-          //   }
-          // }
+          const activeSlice = slices.find((s) => s.isActive);
+          const ct = audioRef.current!.currentTime;
+
+          setCurrentTime(ct);
+
+          if (activeSlice && ct >= activeSlice.end) {
+            audioRef.current!.currentTime = activeSlice.start;
+          }
         }}
         onLoadedMetadata={() => {
           // audioRef.current.duration

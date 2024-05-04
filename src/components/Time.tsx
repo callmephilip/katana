@@ -6,5 +6,5 @@ const formatTime = (time: number) => {
 };
 
 export const Time = ({ time }: { time: number }) => {
-  return <strong>{formatTime(time)}</strong>;
+  return <span>{formatTime(time)}</span>;
 };

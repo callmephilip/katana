@@ -51,6 +51,7 @@ export const Waveform = () => {
       }
       console.log("Created region", region);
       const color = randomColor();
+      // @ts-ignore
       region.setOptions({ color });
       addSlice({
         id: region.id,

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import NoSSR from "./NoSSR";
 import { FFmpegProvider, useFFmpeg } from "@/context/FFmpeg";
 import { PlayerProvider } from "@/context/Player";
@@ -9,53 +8,31 @@ import { Separator } from "@/components/ui/separator";
 import { PlayerControls } from "@/components/PlayerControls";
 import { Waveform } from "@/components/WaveForm";
 import { Slices } from "@/components/Slices";
+import { FileUpload } from "@/components/FileUpload";
 import { FileAudio, Slice } from "lucide-react";
 
 function Home() {
-  const { slices, source, setSource } = useAppState();
+  const { slices, source, loading } = useAppState();
   const { loading: loadingFFmpeg, loadSource } = useFFmpeg();
-
-  useEffect(() => {
-    const doLoadSource = async () => {
-      setSource(
-        await loadSource(
-          "https://qvpozsgvtxumtvszyujr.supabase.co/storage/v1/object/public/tldl-episodes-audio/SEnuWRLMI88.mp3"
-        )
-      );
-    };
-    if (!loadingFFmpeg) {
-      doLoadSource();
-    }
-  }, [loadingFFmpeg]);
 
   console.log(">>>>>>>>> slices >>>>>>>>>>>>>>>>", slices);
 
-  return loadingFFmpeg ? (
+  return loadingFFmpeg || loading ? (
     <strong>loading ffmpeg...</strong>
   ) : (
     <>
       {!source?.url ? (
-        <div>
-          <form>
-            <input
-              type="file"
-              onChange={(e) => {
-                if (!e.target.files) {
-                  return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = async function () {
-                  setSource(
-                    await loadSource(new Uint8Array(this.result as ArrayBuffer))
-                  );
-                };
-
-                reader.readAsArrayBuffer(e.target.files[0]);
-              }}
-            />
-          </form>
-        </div>
+        <>
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold tracking-tight">
+              Create audio clips
+            </h2>
+            <p className="text-muted-foreground">
+              All local and organic, nothing leaves your browser
+            </p>
+          </div>
+          <FileUpload />
+        </>
       ) : (
         <PlayerProvider sourceURL={source.url}>
           <h2 className="scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight first:mt-0">

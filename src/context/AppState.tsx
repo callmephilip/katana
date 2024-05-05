@@ -19,12 +19,15 @@ export interface Slice {
 interface AppStateContextValue {
   source: Source | null;
   setSource: (source: Source) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
   slices: Slice[];
   addSlice: (slice: Slice) => void;
   removeSlice: (slice: Slice) => void;
   updateSlice: (slice: Slice) => void;
   deactiveSlice: () => void;
   sliceAudioToFile: (slice: Slice) => Promise<void>;
+  loadSampleProject: () => Promise<void>;
 }
 
 const AppStateContext = createContext<AppStateContextValue | undefined>(
@@ -38,13 +41,10 @@ export const AppStateProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { sliceAudioToFile } = useFFmpeg();
+  const { sliceAudioToFile, loadSource } = useFFmpeg();
   const [source, setSource] = useState<Source | null>(null);
-  const [slices, setSlices] = useState<Slice[]>(
-    JSON.parse(
-      localStorage.getItem(localStorageKey) || JSON.stringify({ slices: [] })
-    ).slices
-  );
+  const [slices, setSlices] = useState<Slice[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     localStorage.setItem(
@@ -58,6 +58,10 @@ export const AppStateProvider = ({
   return (
     <AppStateContext.Provider
       value={{
+        loading,
+        setLoading(loading) {
+          setLoading(loading);
+        },
         source,
         slices,
         setSource(source) {
@@ -111,6 +115,48 @@ export const AppStateProvider = ({
               end: slice.end,
             });
           }
+        },
+        async loadSampleProject() {
+          setSource(
+            await loadSource(
+              "https://qvpozsgvtxumtvszyujr.supabase.co/storage/v1/object/public/tldl-episodes-audio/SEnuWRLMI88.mp3"
+            )
+          );
+          setSlices([
+            {
+              id: "region-kn0h83n196g",
+              isActive: false,
+              start: 62.72420387606064,
+              end: 137.24196626691204,
+              color:
+                "rgba(126.06706376821512, 53.9018078320232, 159.87745179711112, 0.5)",
+            },
+            {
+              id: "region-k6910rgv0o",
+              isActive: false,
+              start: 217.0853686095044,
+              end: 287.75309030387893,
+              color:
+                "rgba(190.82468864461202, 49.96306824495382, 173.5808003939328, 0.5)",
+            },
+            {
+              id: "region-en4rrkq7deg",
+              isActive: false,
+              start: 788.4044427010555,
+              end: 827.9722247616351,
+              color:
+                "rgba(153.89749524478503, 70.04126649364495, 127.89376108035697, 0.5)",
+            },
+            {
+              id: "region-vqpj8s8d15",
+              isActive: false,
+              start: 473.0231907066041,
+              end: 610.1790179306969,
+              color:
+                "rgba(180.69379543025715, 16.281924389786536, 13.63414441387264, 0.5)",
+            },
+          ]);
+          setLoading(false);
         },
       }}
     >

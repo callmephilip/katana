@@ -25,6 +25,7 @@ export const Waveform = () => {
     waveColor: "rgb(200, 0, 200)",
     progressColor: "rgb(100, 0, 100)",
     media: audio,
+    autoplay: false,
     plugins: useMemo(
       () => [
         regions,
@@ -75,7 +76,7 @@ export const Waveform = () => {
 
     regions.on("region-clicked", (region, e) => {
       e.stopPropagation();
-      // region.setOptions({ content: "Playing" });
+
       updateSlice({
         id: region.id,
         isActive: true,

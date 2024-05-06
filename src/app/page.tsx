@@ -12,7 +12,7 @@ import { FileUpload } from "@/components/FileUpload";
 import { FileAudio, Slice } from "lucide-react";
 
 function Home() {
-  const { slices, source, loading } = useAppState();
+  const { source, loading } = useAppState();
   const { loading: loadingFFmpeg } = useFFmpeg();
 
   return loadingFFmpeg || loading ? (
@@ -72,7 +72,17 @@ export default function HomePage() {
               <div className="flex-grow">Katana</div>
             </div>
           </h2>
-          <div className="ml-auto flex w-full space-x-2 sm:justify-end"></div>
+          <div className="ml-auto flex w-full space-x-2 sm:justify-end">
+            <nav className="flex items-center space-x-4 lg:space-x-6 mx-6">
+              <a
+                className="text-sm font-medium transition-colors hover:text-primary"
+                href="https://github.com/callmephilip/katana"
+                target="_blank"
+              >
+                Source
+              </a>
+            </nav>
+          </div>
         </div>
 
         <Separator />

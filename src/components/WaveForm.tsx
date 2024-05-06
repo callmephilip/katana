@@ -50,7 +50,6 @@ export const Waveform = () => {
       if (slices.map((s) => s.id).includes(region.id)) {
         return;
       }
-      console.log("Created region", region);
       const color = randomColor();
       // @ts-ignore
       region.setOptions({ color });
@@ -64,7 +63,6 @@ export const Waveform = () => {
     });
 
     regions.on("region-updated", (region) => {
-      console.log("Updated region", region);
       updateSlice({
         id: region.id,
         isActive: true,
@@ -93,10 +91,6 @@ export const Waveform = () => {
     });
 
     slices.forEach((slice) => {
-      console.log(
-        ">>>>>>>>>>>>>>> Adding slice from application state ",
-        slice
-      );
       regions.addRegion({
         id: slice.id,
         start: slice.start,
@@ -112,8 +106,6 @@ export const Waveform = () => {
   }, [isReady]);
 
   useEffect(() => {
-    console.log(">>>>>>>>> check for slice removal >>>>>>>>>>>>>>>>", slices);
-    console.log(">>>>>>>>> for regions >>>>>>>>>>>>>>>>", regions.getRegions());
     const regionsToDelete = difference(
       regions.getRegions().map((r) => r.id),
       slices.map((s) => s.id)

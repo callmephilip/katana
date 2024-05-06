@@ -13,9 +13,7 @@ import { FileAudio, Slice } from "lucide-react";
 
 function Home() {
   const { slices, source, loading } = useAppState();
-  const { loading: loadingFFmpeg, loadSource } = useFFmpeg();
-
-  console.log(">>>>>>>>> slices >>>>>>>>>>>>>>>>", slices);
+  const { loading: loadingFFmpeg } = useFFmpeg();
 
   return loadingFFmpeg || loading ? (
     <strong>loading ffmpeg...</strong>

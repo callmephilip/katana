@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 const ytdl = require("ytdl-core");
 
-export const POST = async (req) => {
+export const POST = async (req: NextRequest) => {
   const { videoId, itag } = await req.json();
 
   if (!videoId || !itag) {
@@ -29,10 +29,12 @@ export const POST = async (req) => {
     );
   }
 
-  const { videoName, itagExists } = await ytdl
+  const { itagExists } = await ytdl
     .getBasicInfo(`https://www.youtube.com/watch?v=${videoId}`)
+    // @ts-ignore
     .then((info) => ({
       videoName: info.player_response.videoDetails.title,
+      // @ts-ignore
       itagExists: info.formats.filter((item) => item.itag == itag),
     }));
 
@@ -53,6 +55,7 @@ export const POST = async (req) => {
   let contentLength = 0;
   const data = ytdl(videoId, {
     quality: itag,
+    // @ts-ignore
     filter: (format) =>
       format.audioTrack ? format.audioTrack.audioIsDefault : format,
   });

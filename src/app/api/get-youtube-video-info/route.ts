@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
+
 const ytdl = require("ytdl-core");
 const url = require("url");
 
-export const POST = async (req) => {
+export const POST = async (req: NextRequest) => {
   const jsonBody = await req.json();
   const videoId = jsonBody.videoId;
 
@@ -45,18 +46,25 @@ export const POST = async (req) => {
 
   const { data, status_code } = await ytdl
     .getInfo(videoUrl, {})
+    // @ts-ignore
     .catch((err) => console.log(`Err ${err}`))
+    // @ts-ignore
     .then(async (info) => {
       const formatData = await Promise.all(
         info.formats
+          // @ts-ignore
           .sort((a, b) => {
             const qualityA =
+              // @ts-ignore
               qualityOrder[a.qualityLabel] !== undefined
-                ? qualityOrder[a.qualityLabel]
+                ? // @ts-ignore
+                  qualityOrder[a.qualityLabel]
                 : 8; // Assign a higher order for audio
             const qualityB =
+              // @ts-ignore
               qualityOrder[b.qualityLabel] !== undefined
-                ? qualityOrder[b.qualityLabel]
+                ? // @ts-ignore
+                  qualityOrder[b.qualityLabel]
                 : 8; // Assign a higher order for audio
 
             if (qualityA !== qualityB) {
@@ -66,12 +74,14 @@ export const POST = async (req) => {
             return a.mimeType.localeCompare(b.mimeType);
           })
           .filter(
+            // @ts-ignore
             (value) =>
               (value.qualityLabel && value.audioQuality) ||
               (value.audioQuality &&
                 !value.qualityLabel &&
                 value.mimeType.includes("mp4"))
           )
+          // @ts-ignore
           .map(async (value) => {
             if (!value.contentLength) {
               var parsed = url.parse(value.url);

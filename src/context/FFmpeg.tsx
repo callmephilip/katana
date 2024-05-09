@@ -170,7 +170,7 @@ class Slicer {
 interface FFmpegContextValue {
   loading: boolean;
   loadSource: (
-    source: string | Uint8Array
+    source: string | ArrayBuffer
   ) => Promise<{ filename: string; url: string }>;
   attachSourceToAudioElement: (
     filename: string,
@@ -201,8 +201,12 @@ export const FFmpegProvider = ({ children }: { children: React.ReactNode }) => {
     <FFmpegContext.Provider
       value={{
         loading,
-        loadSource: (source: string | Uint8Array) =>
-          slicer.current.loadSource(source),
+        loadSource: (source: string | ArrayBuffer) => {
+          if (typeof source === "string") {
+            return slicer.current.loadSource(source);
+          }
+          return slicer.current.loadSource(new Uint8Array(source));
+        },
         attachSourceToAudioElement(filename, audio) {
           return slicer.current.attachSourceToAudioElement(filename, audio);
         },

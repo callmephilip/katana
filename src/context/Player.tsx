@@ -38,7 +38,6 @@ export const PlayerProvider = ({
   const { slices } = useAppState();
 
   useEffect(() => {
-    console.log(">>>>>>>>>>>>>>>>> tracking playback for slices", slices);
     const activeSlice = slices.find((s) => s.isActive);
 
     if (activeSlice) {
@@ -59,7 +58,6 @@ export const PlayerProvider = ({
         currentTime,
         playbackState,
         setCurrentTime(time) {
-          console.log("player: setting time", time);
           audioRef.current!.currentTime = time;
           setCurrentTime(time);
         },

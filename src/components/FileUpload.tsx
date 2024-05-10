@@ -48,7 +48,6 @@ export const FileUpload = () => {
       })
       .parse(await data.json());
     const audio = formats.find((f) => f.mimeType.match(/^audio/gi));
-    console.log(">>>>>>>>>>>. got audio", audio);
 
     if (!audio) {
       alert("No audio found");

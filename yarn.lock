@@ -5786,10 +5786,10 @@ walk-up-path@^3.0.1:
   resolved "https://registry.yarnpkg.com/walk-up-path/-/walk-up-path-3.0.1.tgz#c8d78d5375b4966c717eb17ada73dbd41490e886"
   integrity sha512-9YlCL/ynK3CTlrSRrDxZvUauLzAswPCrsaCgilqFevUYpeEW0/3ScEjaa3kbW/T0ghhkEr7mv+fpjqn1Y1YuTA==
 
-wavesurfer.js@^7.7.13:
-  version "7.7.13"
-  resolved "https://registry.yarnpkg.com/wavesurfer.js/-/wavesurfer.js-7.7.13.tgz#66a5388d25d952d653755067a7a744dce2449bb5"
-  integrity sha512-lQ5QkLa0Kzt5jkt4vP+K1RvsopaH5LssxZ3OArxaeetGYvQfot4Xq5UB8CRsJLXF0+hFWOmqc23WGhP64v2byQ==
+wavesurfer.js@^7.7.14:
+  version "7.7.14"
+  resolved "https://registry.yarnpkg.com/wavesurfer.js/-/wavesurfer.js-7.7.14.tgz#7cbb6f8644e27f3845a0c8a954f123e1a0a44afe"
+  integrity sha512-sbd48yHnOVDEbZwsnD3dWzBj4SF2q2rsPysmPE8spoR2XwKVkU/POtZg/L0wPi6ypqXb7brQLftSeOovJNToPQ==
 
 which-boxed-primitive@^1.0.2:
   version "1.0.2"

@@ -1,19 +1,21 @@
 "use client";
 
 import NoSSR from "./NoSSR";
+import { FileAudio, Slice } from "lucide-react";
 import { FFmpegProvider, useFFmpeg } from "@/context/FFmpeg";
 import { PlayerProvider } from "@/context/Player";
 import { AppStateProvider, useAppState } from "@/context/AppState";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayerControls } from "@/components/PlayerControls";
 import { Waveform } from "@/components/WaveForm";
 import { Slices } from "@/components/Slices";
 import { FileUpload } from "@/components/FileUpload";
-import { FileAudio, Slice } from "lucide-react";
+import { DowloadFromYoutube } from "@/features/youtube/components/Download";
 
 function Home() {
-  const { source, loading } = useAppState();
-  const { loading: loadingFFmpeg } = useFFmpeg();
+  const { source, loading, setSource } = useAppState();
+  const { loading: loadingFFmpeg, loadSource } = useFFmpeg();
 
   return loadingFFmpeg || loading ? (
     <strong>loading ffmpeg...</strong>
@@ -29,7 +31,24 @@ function Home() {
               All local and organic, nothing leaves your browser
             </p>
           </div>
-          <FileUpload />
+          <Tabs defaultValue="file" className="w-[600px]">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="file">File (wav, mp3)</TabsTrigger>
+              <TabsTrigger data-cy="tab-youtube-download" value="youtube">
+                Youtube
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="file">
+              <FileUpload />
+            </TabsContent>
+            <TabsContent value="youtube">
+              <DowloadFromYoutube
+                onDownload={async (audio) => {
+                  setSource(await loadSource(audio));
+                }}
+              />
+            </TabsContent>
+          </Tabs>
         </>
       ) : (
         <PlayerProvider sourceURL={source.url}>

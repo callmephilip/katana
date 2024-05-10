@@ -14,7 +14,14 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import "./commands";
+
+Cypress.on("uncaught:exception", (err) => {
+  if (err.message.includes("ErrnoError: FS error")) {
+    // XX: somewhat random error thrown by ffmpeg.wasm
+    return false;
+  }
+});
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

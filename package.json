@@ -10,7 +10,9 @@
     "add-component": "npx shadcn-ui@latest add",
     "test": "vitest",
     "cy:open": "cypress open",
-    "cypress:headless": "cypress run"
+    "cypress:headless": "cypress run",
+    "start-server": "npm start",
+    "ci:e2e": "start-server-and-test dev http://localhost:3000 cypress:headless"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.10",
@@ -53,6 +55,7 @@
     "install": "^0.13.0",
     "npm": "^10.7.0",
     "postcss": "^8",
+    "start-server-and-test": "^2.0.3",
     "tailwindcss": "^3.4.3",
     "typescript": "^5",
     "vite-tsconfig-paths": "^4.3.2",

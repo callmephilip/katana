@@ -135,5 +135,7 @@ export const Waveform = () => {
     // setLoading(false);
   });
 
-  return <div id="waveform" ref={containerRef} />;
+  return (
+    <div data-cy="application-waveform" id="waveform" ref={containerRef} />
+  );
 };

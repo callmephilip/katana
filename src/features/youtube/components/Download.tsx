@@ -62,12 +62,14 @@ export const DowloadFromYoutube = ({
             }}
             value={state.videoURL || ""}
             id="videoURL"
+            data-cy="youtube-video-url"
             placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           />
         </div>
       </CardContent>
       <CardFooter>
         <Button
+          data-cy="youtube-download-audio"
           disabled={state.loading || !state.videoId}
           onClick={async () => {
             dispatch({ type: "download" });

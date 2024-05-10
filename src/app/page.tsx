@@ -34,7 +34,9 @@ function Home() {
           <Tabs defaultValue="file" className="w-[600px]">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="file">File (wav, mp3)</TabsTrigger>
-              <TabsTrigger value="youtube">Youtube</TabsTrigger>
+              <TabsTrigger data-cy="tab-youtube-download" value="youtube">
+                Youtube
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="file">
               <FileUpload />

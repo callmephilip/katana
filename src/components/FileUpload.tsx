@@ -83,6 +83,7 @@ export const FileUpload = () => {
             drop OR
           </p>
           <Button
+            data-cy="load-sample"
             variant="ghost"
             onClick={async (e) => {
               e.stopPropagation();
@@ -104,7 +105,7 @@ export const FileUpload = () => {
           </Button>
           <p className="text-xs text-gray-500 dark:text-gray-400">MP3, WAV</p>
         </div>
-        <input {...getInputProps()} />
+        <input data-cy="upload-file" {...getInputProps()} />
       </label>
     </div>
   );

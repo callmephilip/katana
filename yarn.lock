@@ -1099,10 +1099,10 @@
     loupe "^2.3.7"
     pretty-format "^29.7.0"
 
-"@wavesurfer/react@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@wavesurfer/react/-/react-1.0.5.tgz#d8e37d6157fbfa10deb63fa6776d09457dbb675f"
-  integrity sha512-xbomnyftHfGK+0Q2UHOOE4k5cd2RUBQYh7orgCuYvnmtXxhIgkLZ+jAyOP+watcyjw9x+VeKw++hJYdg0zdPNA==
+"@wavesurfer/react@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@wavesurfer/react/-/react-1.0.6.tgz#57cdecac1d0f23b8cf6b9b2166aeed9a841a57b7"
+  integrity sha512-ooDSebxs2Z00S6h7nGrA8SSXmins6MnJF944MiUVrnVeaoNDDIgursBIXo3MtZ9QLN3Vlt3cNLU3u16vsZZCJg==
 
 abbrev@^2.0.0:
   version "2.0.0"

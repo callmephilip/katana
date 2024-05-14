@@ -12,6 +12,7 @@ import { Waveform } from "@/components/WaveForm";
 import { Slices } from "@/components/Slices";
 import { FileUpload } from "@/components/FileUpload";
 import { DowloadFromYoutube } from "@/features/youtube/components/Download";
+import { TestTranscribe } from "@/features/transcribe/components/TestTranscribe";
 
 function Home() {
   const { source, loading, setSource } = useAppState();
@@ -118,6 +119,7 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+      <TestTranscribe />
     </NoSSR>
   );
 }

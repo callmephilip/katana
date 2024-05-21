@@ -10,6 +10,7 @@ import React, {
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import FileSaver from "file-saver";
+import { log } from "console";
 
 class Slicer {
   private ffmpeg: FFmpeg;
@@ -21,10 +22,35 @@ class Slicer {
     this.ffmpeg = new FFmpeg();
   }
 
+  public async exec(command: string[]): Promise<number> {
+    const r = await this.ffmpeg.exec(command);
+    await this.debug("Exec");
+    return r;
+  }
+
+  public async getLatestExecutionReport(): Promise<string | null> {
+    const entries = await this.ffmpeg.listDir("/");
+    const logFiles = entries
+      .filter((e) => !e.isDir)
+      .filter((e) => e.name.match(/ffmpeg-[0-9-]+\.log/gi));
+
+    if (logFiles.length === 0) {
+      return null;
+    }
+
+    return (await this.ffmpeg.readFile(
+      `/${logFiles.sort()[logFiles.length - 1].name}`,
+      "utf8"
+    )) as string;
+  }
+
   public async loadSource(
     source: string | Uint8Array
   ): Promise<{ filename: string; url: string }> {
-    const filename = `${new Date().getTime()}.mp3`;
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // const filename = `${new Date().getTime()}.mp3`;
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    const filename = `TEST.mp3`;
     const fullPath = this.sourceFilePath(filename);
     await this.loadIFNeeded();
     await this.ffmpeg.writeFile(
@@ -114,6 +140,13 @@ class Slicer {
     return URL.createObjectURL(new Blob([data.buffer], { type: "audio/mp3" }));
   }
 
+  public async getAudioBufferForFile(filename: string): Promise<ArrayBuffer> {
+    const data = (await this.ffmpeg.readFile(
+      this.sourceFilePath(filename)
+    )) as Uint8Array;
+    return data.buffer;
+  }
+
   public async loadIFNeeded() {
     if (!this.ffmpeg.loaded) {
       const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
@@ -155,6 +188,8 @@ class Slicer {
     console.log("basePath", this.basePath);
     console.log("pathSouce", this.pathSouce);
     console.log("pathSlices", this.pathSlices);
+    console.log("/", await this.ffmpeg.listDir("/"));
+    console.log("Home", await this.ffmpeg.listDir(`${this.basePath}`));
     console.log(
       "Source",
       await this.ffmpeg.listDir(`${this.basePath}/${this.pathSouce}`)
@@ -169,13 +204,12 @@ class Slicer {
 
 interface FFmpegContextValue {
   loading: boolean;
+  exec: (command: string[]) => Promise<number>;
+  getLatestExecutionReport: () => Promise<string | null>;
   loadSource: (
     source: string | ArrayBuffer
   ) => Promise<{ filename: string; url: string }>;
-  attachSourceToAudioElement: (
-    filename: string,
-    audio: HTMLAudioElement
-  ) => Promise<string>;
+  getAudioBufferForFile: (filename: string) => Promise<ArrayBuffer>;
   sliceAudioToFile: (args: {
     input: string;
     start: number;
@@ -201,14 +235,18 @@ export const FFmpegProvider = ({ children }: { children: React.ReactNode }) => {
     <FFmpegContext.Provider
       value={{
         loading,
+        exec: (command: string[]) => slicer.current.exec(command),
+        getLatestExecutionReport: async () => {
+          return await slicer.current.getLatestExecutionReport();
+        },
         loadSource: (source: string | ArrayBuffer) => {
           if (typeof source === "string") {
             return slicer.current.loadSource(source);
           }
           return slicer.current.loadSource(new Uint8Array(source));
         },
-        attachSourceToAudioElement(filename, audio) {
-          return slicer.current.attachSourceToAudioElement(filename, audio);
+        getAudioBufferForFile(filename) {
+          return slicer.current.getAudioBufferForFile(filename);
         },
         sliceAudioToFile(args) {
           return slicer.current.sliceAudioToFile(args);

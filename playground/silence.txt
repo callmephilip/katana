@@ -1,0 +1,74 @@
+ffmpeg version 6.1.1 Copyright (c) 2000-2023 the FFmpeg developers
+  built with Apple clang version 15.0.0 (clang-1500.1.0.2.5)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/6.1.1_3 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags='-Wl,-ld_classic' --enable-ffplay --enable-gnutls --enable-gpl --enable-libaom --enable-libaribb24 --enable-libbluray --enable-libdav1d --enable-libharfbuzz --enable-libjxl --enable-libmp3lame --enable-libopus --enable-librav1e --enable-librist --enable-librubberband --enable-libsnappy --enable-libsrt --enable-libssh --enable-libsvtav1 --enable-libtesseract --enable-libtheora --enable-libvidstab --enable-libvmaf --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libxvid --enable-lzma --enable-libfontconfig --enable-libfreetype --enable-frei0r --enable-libass --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopenvino --enable-libspeex --enable-libsoxr --enable-libzmq --enable-libzimg --disable-libjack --disable-indev=jack --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      58. 29.100 / 58. 29.100
+  libavcodec     60. 31.102 / 60. 31.102
+  libavformat    60. 16.100 / 60. 16.100
+  libavdevice    60.  3.100 / 60.  3.100
+  libavfilter     9. 12.100 /  9. 12.100
+  libswscale      7.  5.100 /  7.  5.100
+  libswresample   4. 12.100 /  4. 12.100
+  libpostproc    57.  3.100 / 57.  3.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from './input.mp3':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6mp41
+    creation_time   : 2024-03-18T12:16:26.000000Z
+  Duration: 00:19:18.19, start: 0.000000, bitrate: 129 kb/s
+  Stream #0:0[0x1](und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 1 kb/s (default)
+    Metadata:
+      creation_time   : 2024-03-18T12:16:26.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 -> #0:0 (aac (native) -> pcm_s16le (native))
+Press [q] to stop, [?] for help
+Output #0, s16le, to '/dev/null':
+  Metadata:
+    major_brand     : dash
+    minor_version   : 0
+    compatible_brands: iso6mp41
+    encoder         : Lavf60.16.100
+  Stream #0:0(und): Audio: pcm_s16le, 44100 Hz, stereo, s16, 1411 kb/s (default)
+    Metadata:
+      creation_time   : 2024-03-18T12:16:26.000000Z
+      handler_name    : ISO Media file produced by Google Inc.
+      vendor_id       : [0][0][0][0]
+      encoder         : Lavc60.31.102 pcm_s16le
+size=       0kB time=00:00:00.00 bitrate=N/A speed=N/A    [silencedetect @ 0x60000055b600] silence_start: 0.954218
+[silencedetect @ 0x60000055b600] silence_end: 2.03782 | silence_duration: 1.08361
+[silencedetect @ 0x60000055b600] silence_start: 101.937
+[silencedetect @ 0x60000055b600] silence_end: 102.939 | silence_duration: 1.00175
+[silencedetect @ 0x60000055b600] silence_start: 105.997
+[silencedetect @ 0x60000055b600] silence_end: 107.586 | silence_duration: 1.58952
+[silencedetect @ 0x60000055b600] silence_start: 121.913
+[silencedetect @ 0x60000055b600] silence_end: 123.187 | silence_duration: 1.27395
+[silencedetect @ 0x60000055b600] silence_start: 126.964
+[silencedetect @ 0x60000055b600] silence_end: 128.106 | silence_duration: 1.14161
+[silencedetect @ 0x60000055b600] silence_start: 348.766
+[silencedetect @ 0x60000055b600] silence_end: 349.781 | silence_duration: 1.01497
+[silencedetect @ 0x60000055b600] silence_start: 353.36
+[silencedetect @ 0x60000055b600] silence_end: 354.562 | silence_duration: 1.20188
+size=   68096kB time=00:06:36.41 bitrate=1407.2kbits/s speed= 793x    [silencedetect @ 0x60000055b600] silence_start: 469.851
+[silencedetect @ 0x60000055b600] silence_end: 470.95 | silence_duration: 1.09902
+[silencedetect @ 0x60000055b600] silence_start: 471.958
+[silencedetect @ 0x60000055b600] silence_end: 473.116 | silence_duration: 1.15839
+[silencedetect @ 0x60000055b600] silence_start: 607.506
+[silencedetect @ 0x60000055b600] silence_end: 609.017 | silence_duration: 1.51098
+[silencedetect @ 0x60000055b600] silence_start: 691.409
+[silencedetect @ 0x60000055b600] silence_end: 692.585 | silence_duration: 1.17551
+[silencedetect @ 0x60000055b600] silence_start: 784.244
+[silencedetect @ 0x60000055b600] silence_end: 785.557 | silence_duration: 1.31247
+[silencedetect @ 0x60000055b600] silence_start: 787.713
+[silencedetect @ 0x60000055b600] silence_end: 789.032 | silence_duration: 1.31868
+size=  136448kB time=00:13:12.19 bitrate=1411.0kbits/s speed= 792x    [silencedetect @ 0x60000055b600] silence_start: 818.23
+[silencedetect @ 0x60000055b600] silence_end: 819.53 | silence_duration: 1.30011
+[silencedetect @ 0x60000055b600] silence_start: 955.449
+[silencedetect @ 0x60000055b600] silence_end: 956.475 | silence_duration: 1.02667
+[silencedetect @ 0x60000055b600] silence_start: 968.071
+[silencedetect @ 0x60000055b600] silence_end: 969.461 | silence_duration: 1.39059
+[silencedetect @ 0x60000055b600] silence_start: 1151.02
+[out#0/s16le @ 0x600001454000] video:0kB audio:199516kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000000%
+size=  199516kB time=00:19:18.16 bitrate=1411.2kbits/s speed= 800x    
+[silencedetect @ 0x60000055b600] silence_end: 1158.19 | silence_duration: 7.16932

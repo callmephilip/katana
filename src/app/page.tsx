@@ -16,7 +16,11 @@ import { TestTranscribe } from "@/features/transcribe/components/TestTranscribe"
 
 function Home() {
   const { source, loading, setSource } = useAppState();
-  const { loading: loadingFFmpeg, loadSource } = useFFmpeg();
+  const {
+    loading: loadingFFmpeg,
+    loadSource,
+    getAudioBufferForFile,
+  } = useFFmpeg();
 
   return loadingFFmpeg || loading ? (
     <strong>loading ffmpeg...</strong>
@@ -52,28 +56,31 @@ function Home() {
           </Tabs>
         </>
       ) : (
-        <PlayerProvider sourceURL={source.url}>
-          <h2 className="scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight first:mt-0">
-            <div className="flex items-center">
-              <div className="w-8 flex-none">
-                <FileAudio />
+        <>
+          <TestTranscribe />
+          <PlayerProvider sourceURL={source.url}>
+            <h2 className="scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight first:mt-0">
+              <div className="flex items-center">
+                <div className="w-8 flex-none">
+                  <FileAudio />
+                </div>
+                <div className="flex-grow">{source.filename}</div>
               </div>
-              <div className="flex-grow">{source.filename}</div>
-            </div>
-          </h2>
+            </h2>
 
-          <div className="flex py-4 items-center">
-            <div className="flex-none w-32">
-              <PlayerControls />
+            <div className="flex py-4 items-center">
+              <div className="flex-none w-32">
+                <PlayerControls />
+              </div>
+
+              <div className="grow">
+                <Waveform />
+              </div>
             </div>
 
-            <div className="grow">
-              <Waveform />
-            </div>
-          </div>
-
-          <Slices />
-        </PlayerProvider>
+            <Slices />
+          </PlayerProvider>
+        </>
       )}
     </>
   );
@@ -119,7 +126,6 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-      <TestTranscribe />
     </NoSSR>
   );
 }

@@ -91,6 +91,7 @@ export const Waveform = () => {
     });
 
     slices.forEach((slice) => {
+      console.log(">>>> adding slices", slice);
       regions.addRegion({
         id: slice.id,
         start: slice.start,
@@ -116,6 +117,13 @@ export const Waveform = () => {
         r.remove();
       }
     });
+
+    const regionsToAdd = difference(
+      slices.map((s) => s.id),
+      regions.getRegions().map((r) => r.id)
+    );
+
+    console.log(">>>> regionsToAdd", regionsToAdd);
 
     // region to activate
     const activeRegionId = slices.find((s) => s.isActive)?.id;

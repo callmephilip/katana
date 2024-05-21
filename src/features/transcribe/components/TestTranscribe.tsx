@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useTranscribe } from "@/features/transcribe/hooks/transcribe";
+import { FFmpegProvider, useFFmpeg } from "@/context/FFmpeg";
+import { AppStateProvider, useAppState } from "@/context/AppState";
+import { parseSilenceDetectReport } from "@/lib/ffmpeg";
 
 const downloadAudioFromUrl = async (
   audioDownloadUrl: string,
@@ -39,101 +42,95 @@ const downloadAudioFromUrl = async (
 
 export const TestTranscribe = () => {
   const { transcribe } = useTranscribe();
-  useEffect(() => {});
+  const { source, addSlice } = useAppState();
+  const {
+    getAudioBufferForFile,
+    exec,
+    getLatestExecutionReport,
+    sliceAudioToFile,
+  } = useFFmpeg();
 
   return (
     <>
       <strong>TestTranscribe</strong>
       <button
         onClick={async () => {
-          const requestAbortController = new AbortController();
-          const d = await downloadAudioFromUrl(
-            "/test.wav",
-            requestAbortController
-          );
-          const audioCTX = new AudioContext({
-            sampleRate: 16000, // Constants.SAMPLING_RATE,
-          });
+          // const requestAbortController = new AbortController();
+          // const d = await downloadAudioFromUrl(
+          //   "/test.wav",
+          //   requestAbortController
+          // );
           //   const blobUrl = URL.createObjectURL(
           //     new Blob([d], { type: "audio/*" })
           //   );
-          // @ts-ignore
-          const decoded = await audioCTX.decodeAudioData(d);
 
-          let audio;
-          if (decoded.numberOfChannels === 2) {
-            const SCALING_FACTOR = Math.sqrt(2);
+          console.log(
+            ">>>>>>>>>>>>>>>> split >>>>>>>>>>>",
+            await exec([
+              "-i",
+              "/home/source/TEST.mp3",
+              "-report",
+              "-af",
+              "silencedetect=n=-60dB:d=1", // "silencedetect=d=0.8",
+              "-f",
+              "null",
+              "-",
+            ])
+          );
 
-            let left = decoded.getChannelData(0);
-            let right = decoded.getChannelData(1);
+          const { silence, sound } = parseSilenceDetectReport(
+            (await getLatestExecutionReport()) || ""
+          );
 
-            audio = new Float32Array(left.length);
-            for (let i = 0; i < decoded.length; ++i) {
-              audio[i] = (SCALING_FACTOR * (left[i] + right[i])) / 2;
-            }
-          } else {
-            // If the audio is not stereo, we can just use the first channel:
-            audio = decoded.getChannelData(0);
-          }
+          await sliceAudioToFile({
+            input: source!.filename,
+            start: sound[0].start,
+            end: sound[0].end,
+          });
 
-          console.log(">>>>>>>> input size", audio.length);
-          // @ts-ignore
-          console.log(">>>>>>>>>>>>>>>>", await transcribe(audio));
-          //   setAudioData({
-          //     buffer: decoded,
-          //     url: blobUrl,
-          //     source: AudioSource.URL,
-          //     mimeType: mimeType,
-          //   });
-          //   return () => {
-          //     requestAbortController.abort();
-          //   };
-          //   const loadFile = async () => {
-          //     const audioContext = new AudioContext({
-          //       sampleRate: 16000,
-          //     }); // const SAMPLING_RATE = 16000;
-          //     const audioSrc = "/test.wav";
-          //     const audioData = await fetchAudio(audioSrc);
-          //     audioContext.decodeAudioData(audioData, onDecoded, onDecodeError);
-          //     function fetchAudio(url) {
-          //       return new Promise((resolve, reject) => {
-          //         const request = new XMLHttpRequest();
-          //         request.open("GET", url, true);
-          //         request.responseType = "arraybuffer";
-          //         request.onload = () => resolve(request.response);
-          //         request.onerror = (e) => reject(e);
-          //         request.send();
-          //       });
-          //     }
-          //     async function onDecoded(buffer) {
-          //       // Play the song
-          //       console.log("Got the decoded buffer now play the song", buffer);
-          //       let audio;
-          //       if (buffer.numberOfChannels === 2) {
-          //         const SCALING_FACTOR = Math.sqrt(2);
-          //         let left = buffer.getChannelData(0);
-          //         let right = buffer.getChannelData(1);
-          //         audio = new Float32Array(left.length);
-          //         for (let i = 0; i < buffer.length; ++i) {
-          //           audio[i] = (SCALING_FACTOR * (left[i] + right[i])) / 2;
-          //         }
-          //       } else {
-          //         // If the audio is not stereo, we can just use the first channel:
-          //         audio = buffer.getChannelData(0);
-          //       }
-          //       console.log(">>>>>>>>>>>>>>>>", await transcribe(audio));
-          //       // const source = audioContext.createBufferSource();
-          //       // source.buffer = buffer;
-          //       // source.connect(audioContext.destination);
-          //       // source.loop = true;
-          //       // source.start();
-          //     }
-          //     function onDecodeError(e) {
-          //       console.log("Error decoding buffer: " + e.message);
-          //       console.log(e);
-          //     }
-          //   };
-          //   loadFile();
+          //slices.forEach((slice) => {
+          // console.log(">>>>>>>>>>>>>>>>", slice);
+          // addSlice({
+          //   id: `${new Date().getTime()}`,
+          //   isActive: false,
+          //   start: slice.start,
+          //   end: slice.end,
+          //   color: "red",
+          // });
+          //});
+
+          // id: string;
+          // isActive: boolean;
+          // start: number;
+          // end: number;
+          // color?: string;
+
+          // const audioCTX = new AudioContext({
+          //   sampleRate: 16000, // Constants.SAMPLING_RATE,
+          // });
+          // const d = await getAudioBufferForFile(source!.filename);
+          // // @ts-ignore
+          // const decoded = await audioCTX.decodeAudioData(d);
+
+          // let audio;
+          // if (decoded.numberOfChannels === 2) {
+          //   const SCALING_FACTOR = Math.sqrt(2);
+
+          //   let left = decoded.getChannelData(0);
+          //   let right = decoded.getChannelData(1);
+
+          //   audio = new Float32Array(left.length);
+          //   for (let i = 0; i < decoded.length; ++i) {
+          //     audio[i] = (SCALING_FACTOR * (left[i] + right[i])) / 2;
+          //   }
+          // } else {
+          //   // If the audio is not stereo, we can just use the first channel:
+          //   audio = decoded.getChannelData(0);
+          // }
+
+          // console.log(">>>>>>>> input size", audio.length);
+          // // @ts-ignore
+          // console.log(">>>>>>>>>>>>>>>>", await transcribe(audio));
         }}
       >
         Test

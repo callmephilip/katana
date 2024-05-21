@@ -41,7 +41,7 @@ export const AppStateProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { sliceAudioToFile, loadSource } = useFFmpeg();
+  const { ffmpeg } = useFFmpeg();
   const [source, setSource] = useState<Source | null>(null);
   const [slices, setSlices] = useState<Slice[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -109,18 +109,23 @@ export const AppStateProvider = ({
         },
         async sliceAudioToFile(slice) {
           if (source!.filename) {
-            await sliceAudioToFile({
-              input: source!.filename,
+            const slice = await ffmpeg.sliceAudio({
+              inputFilename: source!.filename,
               start: slice.start,
               end: slice.end,
+              outputFilename: `${new Date().getTime()}.mp3`,
             });
+            await ffmpeg.downloadFile(slice, "audio/mp3");
           }
         },
         async loadSampleProject() {
           setSource(
-            await loadSource(
-              "https://qvpozsgvtxumtvszyujr.supabase.co/storage/v1/object/public/tldl-episodes-audio/SEnuWRLMI88.mp3"
-            )
+            await ffmpeg.saveFile({
+              source:
+                "https://qvpozsgvtxumtvszyujr.supabase.co/storage/v1/object/public/tldl-episodes-audio/SEnuWRLMI88.mp3",
+              filename: "SEnuWRLMI88.mp3",
+              type: "audio/mp3",
+            })
           );
           setSlices([
             {

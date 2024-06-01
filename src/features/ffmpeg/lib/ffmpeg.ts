@@ -5,7 +5,7 @@ import FileSaver from "file-saver";
 export class FFmpeg {
   public static async getInstance() {
     if (!FFmpeg.instance) {
-      const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+      const baseURL = "ffmpeg";
 
       await FFmpeg.ffmpeg.load({
         coreURL: await toBlobURL(

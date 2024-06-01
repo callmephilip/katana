@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { createContext, useContext } from "react";
 import { FFmpeg } from "@/features/ffmpeg/lib/ffmpeg";
 
 interface FFmpegContextValue {

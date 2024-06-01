@@ -109,13 +109,13 @@ export const AppStateProvider = ({
         },
         async sliceAudioToFile(slice) {
           if (source!.filename) {
-            const slice = await ffmpeg.sliceAudio({
+            const s = await ffmpeg.sliceAudio({
               inputFilename: source!.filename,
               start: slice.start,
               end: slice.end,
               outputFilename: `${new Date().getTime()}.mp3`,
             });
-            await ffmpeg.downloadFile(slice, "audio/mp3");
+            await ffmpeg.downloadFile(s, "audio/mp3");
           }
         },
         async loadSampleProject() {

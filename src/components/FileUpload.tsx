@@ -1,6 +1,5 @@
 "use client";
 
-import { z } from "zod";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { useFFmpeg } from "@/context/FFmpeg";
@@ -10,14 +9,20 @@ import { Upload } from "lucide-react";
 
 export const FileUpload = () => {
   const { setSource, setLoading, loadSampleProject } = useAppState();
-  const { loadSource } = useFFmpeg();
+  const { ffmpeg } = useFFmpeg();
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length !== 0) {
       const reader = new FileReader();
       reader.onabort = () => console.log("file reading was aborted");
       reader.onerror = () => console.log("file reading has failed");
       reader.onload = async () => {
-        setSource(await loadSource(reader.result as ArrayBuffer));
+        setSource(
+          await ffmpeg.saveFile({
+            source: reader.result as ArrayBuffer,
+            filename: acceptedFiles[0].name,
+            type: acceptedFiles[0].type,
+          })
+        );
       };
       reader.readAsArrayBuffer(acceptedFiles[0]);
     }
@@ -29,42 +34,6 @@ export const FileUpload = () => {
       "audio/wav": [".wav"],
     },
   });
-
-  const downloadFromYoutube = async () => {
-    const videoId = "Z8OVUUkzVeg";
-    const data = await fetch("/api/get-youtube-video-info", {
-      method: "POST",
-      body: JSON.stringify({ videoId }),
-    });
-    const { formats } = z
-      .object({
-        success: z.literal(true),
-        formats: z
-          .object({
-            itag: z.number(),
-            mimeType: z.string(),
-          })
-          .array(),
-      })
-      .parse(await data.json());
-    const audio = formats.find((f) => f.mimeType.match(/^audio/gi));
-
-    if (!audio) {
-      alert("No audio found");
-      return;
-    }
-
-    const response = await fetch("/api/download-youtube-audio", {
-      method: "POST",
-      body: JSON.stringify({ videoId, itag: audio.itag }),
-    });
-
-    setSource(
-      await loadSource(
-        new Uint8Array(await (await response.blob()).arrayBuffer())
-      )
-    );
-  };
 
   return (
     <div
@@ -91,16 +60,6 @@ export const FileUpload = () => {
             }}
           >
             Load sample
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={async (e) => {
-              e.stopPropagation();
-              // setLoading(true);
-              await downloadFromYoutube();
-            }}
-          >
-            Youtube
           </Button>
           <p className="text-xs text-gray-500 dark:text-gray-400">MP3, WAV</p>
         </div>

@@ -98,6 +98,7 @@ export const Slices = () => {
                 <span className="sr-only">Delete</span>
               </Button>
               <Button
+                data-role="download-slice-button"
                 onClick={(e) => {
                   e.stopPropagation();
                   sliceAudioToFile(slice);

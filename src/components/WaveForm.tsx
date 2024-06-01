@@ -90,22 +90,18 @@ export const Waveform = () => {
       resize: true,
     });
 
-    slices.forEach((slice) => {
-      regions.addRegion({
-        id: slice.id,
-        start: slice.start,
-        end: slice.end,
-        color: slice.color,
-        content: slice.isActive ? "▶️" : undefined,
-      });
-    });
-
     wavesurfer?.on("click", () => {
       deactiveSlice();
     });
   }, [isReady]);
 
   useEffect(() => {
+    if (!isReady) return;
+
+    // sync between slices (app state) and internal wavesurfer's regions
+
+    // Delete regions that have been removed from the app state
+
     const regionsToDelete = difference(
       regions.getRegions().map((r) => r.id),
       slices.map((s) => s.id)
@@ -116,6 +112,25 @@ export const Waveform = () => {
         r.remove();
       }
     });
+
+    // Add regions that have been added to the app state
+
+    const regionsToAdd = difference(
+      slices.map((s) => s.id),
+      regions.getRegions().map((r) => r.id)
+    );
+
+    slices
+      .filter((s) => regionsToAdd.includes(s.id))
+      .forEach((slice) => {
+        regions.addRegion({
+          id: slice.id,
+          start: slice.start,
+          end: slice.end,
+          color: slice.color,
+          content: slice.isActive ? "▶️" : undefined,
+        });
+      });
 
     // region to activate
     const activeRegionId = slices.find((s) => s.isActive)?.id;
@@ -129,7 +144,7 @@ export const Waveform = () => {
     } else {
       regions.getRegions().forEach((r) => r.setContent(undefined));
     }
-  }, [slices]);
+  }, [slices, isReady]);
 
   wavesurfer?.on("redrawcomplete", () => {
     // setLoading(false);

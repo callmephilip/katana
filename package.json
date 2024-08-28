@@ -46,7 +46,7 @@
     "@types/lodash.debounce": "^4.0.9",
     "@types/lodash.difference": "^4.5.9",
     "@types/lodash.sortby": "^4.7.9",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "cypress": "^13.9.0",
